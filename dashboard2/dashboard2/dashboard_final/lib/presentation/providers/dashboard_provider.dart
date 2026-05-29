@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class DashboardProvider extends ChangeNotifier {
-  static const String baseUrl = "https://backendmindpet-production.up.railway.app/api";
+  static const String baseUrl = "https://backendmindpet-production.up.railway.app";
 
   Map<String, dynamic> stats = {};
 
@@ -16,7 +16,7 @@ Future<void> loadStats() async {
     notifyListeners();
 
     // Definimos los tres endpoints correspondientes
-    final statsUrl = Uri.parse("$baseUrl/dashboard/stats");
+    final statsUrl = Uri.parse("$baseUrl/api/dashboard/stats");
     final diariosUrl = Uri.parse("$baseUrl/diarios/listar");
     final usuariosUrl = Uri.parse("$baseUrl/usuarios/rol/USUARIO");
 
