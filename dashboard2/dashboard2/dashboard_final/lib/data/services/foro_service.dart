@@ -13,6 +13,8 @@ class ForoService {
     final uri = Uri.parse(
       _baseUrl,
     ).replace(queryParameters: {'usuarioIdActual': usuarioIdActual.toString()});
+  // Tu endpoint corregido en Railway
+  final String _baseUrl = 'https://backendmindpet-production.up.railway.app/api/publicaciones';
 
     try {
       final request = http.Request('GET', uri);
