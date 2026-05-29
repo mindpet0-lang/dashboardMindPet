@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class ForoService {
   // Tu endpoint corregido en Railway
-  final String _baseUrl = 'https://backendmindpet-production.up.railway.app/publicaciones';
+  final String _baseUrl = 'https://backendmindpet-production.up.railway.app/api/publicaciones';
 
   Future<List<dynamic>> fetchPublicaciones() async {
     try {

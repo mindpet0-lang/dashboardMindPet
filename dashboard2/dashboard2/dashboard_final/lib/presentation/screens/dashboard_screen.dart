@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../providers/dashboard_provider.dart';
 import '../../widgets/layout/app_layout.dart';
 import '../../widgets/common/stat_card.dart';
-import '../../widgets/maps/movable_map_widget.dart'; 
+
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_text_styles.dart'; 
