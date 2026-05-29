@@ -1,3 +1,4 @@
+import 'package:dashboard_final/presentation/screens/foro_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../screens/login_screen.dart';
@@ -5,17 +6,13 @@ import '../screens/register_screen.dart';
 import '../screens/dashboard_screen.dart';
 
 class AppPages {
+  static Map<String, WidgetBuilder> routes = {
+    "/login": (context) => const LoginScreen(),
 
-  static Map<String, WidgetBuilder>
-      routes = {
+    "/register": (context) => const RegisterScreen(),
 
-    "/login": (context) =>
-        const LoginScreen(),
+    "/dashboard": (context) => const DashboardScreen(),
 
-    "/register": (context) =>
-        const RegisterScreen(),
-
-    "/dashboard": (context) =>
-        const DashboardScreen(),
+    "/foro": (context) => const ForoScreen(),
   };
 }

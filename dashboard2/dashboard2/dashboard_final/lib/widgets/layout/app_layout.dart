@@ -6,7 +6,7 @@ import '../layout/topbar.dart';
 import '../../presentation/screens/dashboard_screen.dart';
 import '../../presentation/screens/diario_screen.dart';
 import '../../presentation/screens/chatbot_screen.dart';
-import '../../presentation/screens/juegos_screen.dart';
+import '../../presentation/screens/foro_screen.dart';
 import '../../presentation/screens/respiracion_screen.dart';
 
 class AppLayout extends StatefulWidget {
@@ -59,7 +59,7 @@ class _AppLayoutState extends State<AppLayout> {
       case 3:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const JuegosScreen()),
+          MaterialPageRoute(builder: (_) => const ForoScreen()),
         );
         break;
 

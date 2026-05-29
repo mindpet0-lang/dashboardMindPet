@@ -32,7 +32,7 @@ class MobileNavbar extends StatelessWidget {
             break;
 
           case 3:
-            Navigator.pushNamed(context, AppRoutes.juegos);
+            Navigator.pushNamed(context, AppRoutes.foro);
             break;
 
           case 4:
@@ -55,7 +55,7 @@ class MobileNavbar extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.games),
-          label: 'Juegos',
+          label: 'Foro',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.air),

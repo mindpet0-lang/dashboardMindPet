@@ -47,7 +47,7 @@ class Sidebar extends StatelessWidget {
 
           buildItem(
             icon: Icons.games,
-            title: "Juegos",
+            title: "Foro",
             index: 3,
           ),
 
