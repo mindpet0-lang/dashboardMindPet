@@ -51,11 +51,7 @@ class Sidebar extends StatelessWidget {
             index: 3,
           ),
 
-          buildItem(
-            icon: Icons.air,
-            title: "Respiración",
-            index: 4,
-          ),
+
         ],
       ),
     );

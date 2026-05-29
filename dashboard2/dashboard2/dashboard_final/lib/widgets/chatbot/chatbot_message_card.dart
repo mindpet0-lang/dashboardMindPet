@@ -1,138 +1,101 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../presentation/providers/chatbot_provider.dart';
 
-class ChatbotMessageCard
-    extends StatelessWidget {
-
-  const ChatbotMessageCard({
-    super.key,
-  });
+class ChatbotMessageCard extends StatelessWidget {
+  const ChatbotMessageCard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<ChatbotProvider>(context);
+    final realMessages = provider.messages;
 
-    return Container(
+    if (provider.isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(color: Color(0xFF6366F1)),
+      );
+    }
 
-      padding:
-          const EdgeInsets.all(20),
+    if (realMessages.isEmpty) {
+      return const Center(
+        child: Text(
+          "No hay registros disponibles en la tabla MESSAGE",
+          style: TextStyle(fontSize: 15, color: Colors.grey),
+        ),
+      );
+    }
 
-      decoration: BoxDecoration(
-
-        color:
-            Theme.of(context).cardColor,
-
-        borderRadius:
-            BorderRadius.circular(24),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      floatingActionButton: FloatingActionButton.small(
+        backgroundColor: const Color(0xFF6366F1),
+        onPressed: () => provider.cargarMensajesReales(),
+        child: const Icon(Icons.refresh, color: Colors.white),
       ),
-
-      child: const Column(
-
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
-
-        children: [
-
-          Text(
-
-            "Última conversación",
-
-            style: TextStyle(
-
-              fontSize: 18,
-
-              fontWeight:
-                  FontWeight.bold,
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              dividerColor: Colors.grey.withOpacity(0.15),
+            ),
+            child: DataTable(
+              headingRowColor: WidgetStateProperty.all(
+                Theme.of(context).scaffoldBackgroundColor.withOpacity(0.6),
+              ),
+              columnSpacing: 35,
+              columns: const [
+                DataColumn(label: Text('ID', style: TextStyle(fontWeight: FontWeight.bold))),
+                DataColumn(label: Text('Remitente', style: TextStyle(fontWeight: FontWeight.bold))),
+                DataColumn(label: Text('Contenido', style: TextStyle(fontWeight: FontWeight.bold))),
+                DataColumn(label: Text('Timestamp', style: TextStyle(fontWeight: FontWeight.bold))),
+                DataColumn(label: Text('Usuario ID', style: TextStyle(fontWeight: FontWeight.bold))),
+              ],
+              rows: realMessages.map((msg) {
+                return DataRow(
+                  cells: [
+                    DataCell(Text(msg.id.toString())),
+                    DataCell(
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: msg.isUser 
+                              ? const Color(0xFF8B5CF6).withOpacity(0.12) 
+                              : const Color(0xFF06B6D4).withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: msg.isUser ? const Color(0xFF8B5CF6) : const Color(0xFF06B6D4),
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          msg.sender,
+                          style: TextStyle(
+                            color: msg.isUser ? const Color(0xFF8B5CF6) : const Color(0xFF06B6D4),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+                    ),
+                    DataCell(
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 320),
+                        child: Text(
+                          msg.content,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                    ),
+                    DataCell(Text(msg.timestamp)),
+                    DataCell(Text(msg.userId.toString())),
+                  ],
+                );
+              }).toList(),
             ),
           ),
-
-          SizedBox(height: 20),
-
-          Align(
-
-            alignment:
-                Alignment.centerRight,
-
-            child: _UserBubble(),
-          ),
-
-          SizedBox(height: 14),
-
-          Align(
-
-            alignment:
-                Alignment.centerLeft,
-
-            child: _AiBubble(),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _UserBubble
-    extends StatelessWidget {
-
-  const _UserBubble();
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Container(
-
-      padding:
-          const EdgeInsets.all(14),
-
-      decoration: BoxDecoration(
-
-        color:
-            const Color(0xFF8B5CF6),
-
-        borderRadius:
-            BorderRadius.circular(18),
-      ),
-
-      child: const Text(
-
-        "Hoy tuve mucha ansiedad.",
-
-        style: TextStyle(
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-}
-
-class _AiBubble
-    extends StatelessWidget {
-
-  const _AiBubble();
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Container(
-
-      padding:
-          const EdgeInsets.all(14),
-
-      decoration: BoxDecoration(
-
-        color:
-            const Color(0xFF06B6D4)
-                .withOpacity(0.15),
-
-        borderRadius:
-            BorderRadius.circular(18),
-      ),
-
-      child: const Text(
-
-        "Respira profundo 💜 Estoy aquí para ayudarte.",
-
-        style: TextStyle(
-          fontWeight:
-              FontWeight.w500,
         ),
       ),
     );

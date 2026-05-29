@@ -1,202 +1,76 @@
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 import '../../widgets/layout/app_layout.dart';
-
-import '../../widgets/chatbot/ai_status_card.dart';
-import '../../widgets/chatbot/chatbot_stats_card.dart';
-import '../../widgets/chatbot/quick_action_card.dart';
-import '../../widgets/chatbot/emotion_ai_card.dart';
+import '../providers/chatbot_provider.dart';
 import '../../widgets/chatbot/chatbot_message_card.dart';
 
-class ChatbotScreen
-    extends StatelessWidget {
-      final String totalMensajes;
-  final String totalSesiones;
-  final String estadoEmocional;
-  final String estadoIA;  
-  
-  const ChatbotScreen({
-    super.key,
-    required this.totalMensajes,
-    required this.totalSesiones,
-    required this.estadoEmocional,
-    required this.estadoIA,
-  });
+class ChatbotScreen extends StatefulWidget {
+  const ChatbotScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<ChatbotScreen> createState() => _ChatbotScreenState();
+}
 
-    final isMobile =
-        MediaQuery.of(context)
-                .size
-                .width <
-            800;
+class _ChatbotScreenState extends State<ChatbotScreen> {
+  @override
+  Widget build(BuildContext context) {
+    final chatbotProvider = Provider.of<ChatbotProvider>(context);
 
     return AppLayout(
-
-      title: "MindPet AI",
-
+      title: "MindPet AI - Panel de Control",
       currentIndex: 2,
-
-      child: SingleChildScrollView(
-
-        padding:
-            const EdgeInsets.all(20),
-
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            const AiStatusCard(),
-
-            const SizedBox(height: 24),
-
-            GridView.count(
-
-              crossAxisCount:
-                  isMobile ? 2 : 4,
-
-              shrinkWrap: true,
-
-              physics:
-                  const NeverScrollableScrollPhysics(),
-
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-
-              childAspectRatio:
-                  isMobile ? 1 : 1.1,
-
-              children: [
-
-                ChatbotStatsCard(
-                  title: "Mensajes",
-                  value: totalMensajes,
-                  icon: Icons.chat,
-                  color:
-                      Color(0xFF8B5CF6),
+            // Banner superior de estado
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
                 ),
-
-                ChatbotStatsCard(
-                  title: "Sesiones",
-                  value: "18",
-                  icon: Icons.psychology,
-                  color:
-                      Color(0xFF06B6D4),
-                ),
-
-                ChatbotStatsCard(
-                  title: "Estado",
-                  value: "Calma",
-                  icon:
-                      Icons.favorite,
-                  color:
-                      Color(0xFF10B981),
-                ),
-
-                ChatbotStatsCard(
-                  title: "IA",
-                  value: "Activa",
-                  icon:
-                      Icons.smart_toy,
-                  color:
-                      Color(0xFF6366F1),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 24),
-
-            GridView.count(
-
-              crossAxisCount:
-                  isMobile ? 2 : 4,
-
-              shrinkWrap: true,
-
-              physics:
-                  const NeverScrollableScrollPhysics(),
-
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-
-              childAspectRatio: 1.3,
-
-              children: const [
-
-                QuickActionCard(
-                  title:
-                      "Hablar con IA",
-                  icon:
-                      Icons.chat_bubble,
-                  color:
-                      Color(0xFF8B5CF6),
-                ),
-
-                QuickActionCard(
-                  title:
-                      "Respiración",
-                  icon: Icons.air,
-                  color:
-                      Color(0xFF06B6D4),
-                ),
-
-                QuickActionCard(
-                  title:
-                      "Meditación",
-                  icon:
-                      Icons.spa,
-                  color:
-                      Color(0xFF10B981),
-                ),
-
-                QuickActionCard(
-                  title:
-                      "Estado emocional",
-                  icon:
-                      Icons.favorite,
-                  color:
-                      Color(0xFF6366F1),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 24),
-
-            isMobile
-
-                ? const Column(
-
-                    children: [
-
-                      EmotionAiCard(),
-
-                      SizedBox(height: 20),
-
-                      ChatbotMessageCard(),
-                    ],
-                  )
-
-                : const Row(
-
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-
-                    children: [
-
-                      Expanded(
-                        child:
-                            EmotionAiCard(),
-                      ),
-
-                      SizedBox(width: 20),
-
-                      Expanded(
-                        child:
-                            ChatbotMessageCard(),
-                      ),
-                    ],
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Historial de Mensajes de la IA",
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
                   ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "Conexión directa con PostgreSQL • ${chatbotProvider.messages.length} filas detectadas",
+                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Contenedor dinámico donde se inyecta la tabla pura
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.01),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const ClipRRect(
+                  child: ChatbotMessageCard(),
+                ),
+              ),
+            ),
           ],
         ),
       ),

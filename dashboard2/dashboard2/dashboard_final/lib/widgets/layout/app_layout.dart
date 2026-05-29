@@ -7,7 +7,7 @@ import '../../presentation/screens/dashboard_screen.dart';
 import '../../presentation/screens/diario_screen.dart';
 import '../../presentation/screens/chatbot_screen.dart';
 import '../../presentation/screens/foro_screen.dart';
-import '../../presentation/screens/respiracion_screen.dart';
+
 
 class AppLayout extends StatefulWidget {
   final String title;
@@ -31,43 +31,16 @@ class _AppLayoutState extends State<AppLayout> {
 
     switch (index) {
       case 0:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const DashboardScreen()),
-        );
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const DashboardScreen()));
         break;
-
       case 1:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const DiarioScreen()),
-        );
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const DiarioScreen()));
         break;
-
       case 2:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const ChatbotScreen(
-            totalMensajes: "124", 
-              totalSesiones: "18",
-              estadoEmocional: "Calma",
-              estadoIA: "Activa",
-          )),
-        );
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const ChatbotScreen()));
         break;
-
       case 3:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const ForoScreen()),
-        );
-        break;
-
-      case 4:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const RespiracionScreen()),
-        );
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const ForoScreen()));
         break;
     }
   }
@@ -78,7 +51,6 @@ class _AppLayoutState extends State<AppLayout> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-
       drawer: isMobile
           ? Drawer(
               child: Sidebar(
@@ -87,7 +59,6 @@ class _AppLayoutState extends State<AppLayout> {
               ),
             )
           : null,
-
       body: Row(
         children: [
           if (!isMobile)
@@ -95,7 +66,6 @@ class _AppLayoutState extends State<AppLayout> {
               currentIndex: widget.currentIndex,
               onTap: navigateTo,
             ),
-
           Expanded(
             child: Column(
               children: [
@@ -103,7 +73,6 @@ class _AppLayoutState extends State<AppLayout> {
                   title: widget.title,
                   isMobile: isMobile,
                 ),
-
                 Expanded(
                   child: widget.child,
                 ),

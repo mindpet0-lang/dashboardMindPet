@@ -1,14 +1,34 @@
 import 'package:flutter/material.dart';
+import '../../data/models/chatbot_model.dart';
+import '../../data/repositories/chatbot_repository.dart';
 
-class ChatbotProvider
-    extends ChangeNotifier {
+class ChatbotProvider extends ChangeNotifier {
+  final ChatbotRepository _repository;
+  
+  List<ChatbotModel> _messages = [];
+  bool _isLoading = false;
 
-  List<String> messages = [];
+  // Al crearse el Provider, ejecuta inmediatamente la petición HTTP a Railway
+  ChatbotProvider(this._repository) {
+    cargarMensajesReales();
+  }
 
-  void sendMessage(String msg) {
+  List<ChatbotModel> get messages => _messages;
+  bool get isLoading => _isLoading;
 
-    messages.add(msg);
-
+  Future<void> cargarMensajesReales() async {
+    _isLoading = true;
     notifyListeners();
+
+    try {
+      print("ChatbotProvider: Solicitando historial de mensajes al repositorio...");
+      _messages = await _repository.getHistorialMensajes();
+      print("ChatbotProvider: ¡Éxito! Se cargaron ${_messages.length} mensajes en memoria.");
+    } catch (e) {
+      print("❌ Error cargando tabla de mensajes en Provider: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners(); // Notifica a la interfaz para que dibuje las filas reales
+    }
   }
 }

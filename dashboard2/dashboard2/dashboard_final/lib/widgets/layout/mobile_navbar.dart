@@ -35,9 +35,6 @@ class MobileNavbar extends StatelessWidget {
             Navigator.pushNamed(context, AppRoutes.foro);
             break;
 
-          case 4:
-            Navigator.pushNamed(context, AppRoutes.respiracion);
-            break;
         }
       },
       items: const [
@@ -57,10 +54,7 @@ class MobileNavbar extends StatelessWidget {
           icon: Icon(Icons.games),
           label: 'Foro',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.air),
-          label: 'Respirar',
-        ),
+        
       ],
     );
   }
