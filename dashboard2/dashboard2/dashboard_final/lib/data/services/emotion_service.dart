@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 class EmotionService {
 
   static const String baseUrl =
-      "http://127.0.0.1:8080/api";
+      "https://backendmindpet-production.up.railway.app/api";
 
   Future<void> saveEmotion({
 

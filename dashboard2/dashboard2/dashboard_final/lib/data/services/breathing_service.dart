@@ -7,7 +7,7 @@ import '../models/breathing_model.dart';
 class BreathingService {
 
   static const String baseUrl =
-      "http://10.0.2.2:8080/api/breathing";
+      "https://backendmindpet-production.up.railway.app/api/breathing";
 
   Future<List<BreathingModel>>
       getSessions() async {

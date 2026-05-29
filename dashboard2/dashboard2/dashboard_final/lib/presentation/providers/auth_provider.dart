@@ -8,7 +8,7 @@ class AuthProvider extends ChangeNotifier {
   bool loading = false;
 
   final String baseUrl =
-      "http://localhost:8080/usuarios";
+      "https://backendmindpet-production.up.railway.app/usuarios";
 
   Future<bool> register(
 

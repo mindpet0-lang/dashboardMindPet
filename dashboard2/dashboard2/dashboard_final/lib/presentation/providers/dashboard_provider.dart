@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class DashboardProvider extends ChangeNotifier {
-  static const String baseUrl = "http://127.0.0.1:8080/api";
+  static const String baseUrl = "https://backendmindpet-production.up.railway.app/api";
 
   Map<String, dynamic> stats = {};
 

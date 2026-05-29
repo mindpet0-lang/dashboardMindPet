@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthService {
 
   static const String baseUrl =
-      "http://localhost:8080/usuarios";
+      "https://backendmindpet-production.up.railway.app/usuarios";
 
   Future<Map<String, dynamic>?> login(
     String correo,

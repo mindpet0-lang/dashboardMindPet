@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 class DashboardService {
 
   static const String baseUrl =
-      "http://10.0.2.2:8080/api";
+      "https://backendmindpet-production.up.railway.app/api";
 
   Future<dynamic> getDashboard() async {
 
