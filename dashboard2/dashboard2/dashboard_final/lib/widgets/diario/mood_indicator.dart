@@ -2,22 +2,21 @@ import 'package:flutter/material.dart';
 
 class MoodIndicator extends StatelessWidget {
   final String mood;
-  final double? percentage; // 👈 Cambiado a opcional con '?' para evitar el choque de Null
+  final double? percentage;
   final Color color;
   final IconData icon;
 
   const MoodIndicator({
     super.key,
     required this.mood,
-    this.percentage, // 👈 Ya no requiere 'required' obligatoriamente
+    this.percentage,
     required this.color,
     required this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Si viene nulo o indefinido mientras conecta, se fuerza a 0 de forma segura sin romperse
-    final double valorSeguro = percentage ?? 0.0;
+    final value = percentage ?? 0.0;
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -26,7 +25,7 @@ class MoodIndicator extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -40,18 +39,14 @@ class MoodIndicator extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(
-                  icon,
-                  color: color,
-                  size: 28,
-                ),
+                child: Icon(icon, color: color, size: 28),
               ),
               const Spacer(),
               Text(
-                "${valorSeguro.toInt()}", // Usa el valor protegido
+                value.toInt().toString(),
                 style: TextStyle(
                   color: color,
                   fontWeight: FontWeight.bold,
@@ -63,29 +58,22 @@ class MoodIndicator extends StatelessWidget {
           const SizedBox(height: 20),
           Text(
             mood,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: LinearProgressIndicator(
-              // Evitamos cualquier operación matemática si no hay registros activos
-              value: valorSeguro > 0 ? 0.7 : 0.0, 
+              value: value > 0 ? 0.7 : 0.0,
               minHeight: 10,
-              backgroundColor: color.withOpacity(0.15),
+              backgroundColor: color.withValues(alpha: 0.15),
               valueColor: AlwaysStoppedAnimation(color),
             ),
           ),
           const SizedBox(height: 10),
           Text(
             "Cantidad total registrada",
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 13,
-            ),
+            style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
           ),
         ],
       ),

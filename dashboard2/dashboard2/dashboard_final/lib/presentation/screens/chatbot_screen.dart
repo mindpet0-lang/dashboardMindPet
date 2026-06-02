@@ -33,7 +33,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
         final userLabels = stats.keys.toList();
         final maxY = stats.values.isEmpty
             ? 10.0
-            : stats.values.reduce((a, b) => a > b ? a : b).toDouble() + 3;
+            : _asDouble(stats.values.reduce((a, b) => a > b ? a : b)) + 3;
 
         return AppLayout(
           title: "MindPet AI - Panel de Control",
@@ -224,7 +224,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                 ),
                 barGroups: List.generate(userLabels.length, (index) {
                   final usuario = userLabels[index];
-                  final cantidad = stats[usuario]!.toDouble();
+                  final cantidad = _asDouble(stats[usuario]);
 
                   return BarChartGroupData(
                     x: index,
@@ -270,5 +270,11 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
         ],
       ),
     );
+  }
+
+  double _asDouble(Object? value) {
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
   }
 }

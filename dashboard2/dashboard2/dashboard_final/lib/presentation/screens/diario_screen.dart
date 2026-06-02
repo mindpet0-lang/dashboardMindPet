@@ -19,8 +19,11 @@ class _DiarioScreenState extends State<DiarioScreen> {
   bool isLoading = true;
   int totalEntradas = 0;
 
-  int cantidadFelicidad = 0;
+  int cantidadEmocionPositiva = 0;
   int cantidadOtrasEmociones = 0;
+
+  double get _emocionPositivaSegura => _asDouble(cantidadEmocionPositiva);
+  double get _otrasEmocionesSeguras => _asDouble(cantidadOtrasEmociones);
 
   @override
   void initState() {
@@ -109,11 +112,11 @@ class _DiarioScreenState extends State<DiarioScreen> {
 
   void _calcularCantidadesReales(List<dynamic> entradas) {
     if (entradas.isEmpty) {
-      cantidadFelicidad = 0;
+      cantidadEmocionPositiva = 0;
       cantidadOtrasEmociones = 0;
       return;
     }
-    cantidadFelicidad = entradas
+    cantidadEmocionPositiva = entradas
         .where(
           (e) =>
               e['emocion'] == 'Amor' ||
@@ -121,7 +124,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
               e['emocion'] == 'Felicidad',
         )
         .length;
-    cantidadOtrasEmociones = entradas.length - cantidadFelicidad;
+    cantidadOtrasEmociones = entradas.length - cantidadEmocionPositiva;
   }
 
   void _mostrarVentanaEditar(
@@ -226,9 +229,16 @@ class _DiarioScreenState extends State<DiarioScreen> {
   }
 
   void _mostrarSnackbar(String mensaje) {
+    if (!mounted) return;
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(mensaje)));
+  }
+
+  double _asDouble(Object? value) {
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
   }
 
   @override
@@ -275,8 +285,8 @@ class _DiarioScreenState extends State<DiarioScreen> {
                             children: [
                               Expanded(
                                 child: MoodIndicator(
-                                  mood: "Felicidad",
-                                  percentage: cantidadFelicidad.toDouble(),
+                                  mood: "Emociones Positivas",
+                                  percentage: _emocionPositivaSegura,
                                   color: const Color(0xFF06B6D4),
                                   icon: Icons.sentiment_very_satisfied,
                                 ),
@@ -285,7 +295,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
                               Expanded(
                                 child: MoodIndicator(
                                   mood: "Otras Emociones",
-                                  percentage: cantidadOtrasEmociones.toDouble(),
+                                  percentage: _otrasEmocionesSeguras,
                                   color: const Color(0xFF6366F1),
                                   icon: Icons.bubble_chart,
                                 ),
@@ -481,14 +491,14 @@ class _DiarioScreenState extends State<DiarioScreen> {
       const SizedBox(height: 16),
       MoodIndicator(
         mood: "Felicidad",
-        percentage: cantidadFelicidad.toDouble(),
+        percentage: _emocionPositivaSegura,
         color: const Color(0xFF06B6D4),
         icon: Icons.sentiment_very_satisfied,
       ),
       const SizedBox(height: 16),
       MoodIndicator(
         mood: "Otras Emociones",
-        percentage: cantidadOtrasEmociones.toDouble(),
+        percentage: _otrasEmocionesSeguras,
         color: const Color(0xFF6366F1),
         icon: Icons.bubble_chart,
       ),

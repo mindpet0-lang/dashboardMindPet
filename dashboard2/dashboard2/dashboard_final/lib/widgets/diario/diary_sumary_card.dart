@@ -18,19 +18,15 @@ class DiarySummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(18),
-      // Le damos una altura mínima interna por defecto para asegurar consistencia
-      constraints: const BoxConstraints(minHeight: 140), 
+      constraints: const BoxConstraints(minHeight: 140),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         gradient: LinearGradient(
-          colors: [
-            color.withOpacity(0.9),
-            color.withOpacity(0.6),
-          ],
+          colors: [color.withValues(alpha: 0.9), color.withValues(alpha: 0.6)],
         ),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.3),
+            color: color.withValues(alpha: 0.3),
             blurRadius: 15,
             offset: const Offset(0, 6),
           ),
@@ -38,20 +34,17 @@ class DiarySummaryCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        // En lugar de Spacer(), usamos esto para distribuir el icono arriba y el texto abajo
-        mainAxisAlignment: MainAxisAlignment.spaceBetween, 
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(
-            icon,
-            color: Colors.white,
-            size: 32,
-          ),
-          const SizedBox(height: 16), // Espaciado controlado garantizado
+          Icon(icon, color: Colors.white, size: 32),
+          const SizedBox(height: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 26,
@@ -61,10 +54,9 @@ class DiarySummaryCard extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 title,
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Colors.white70, fontSize: 14),
               ),
             ],
           ),
