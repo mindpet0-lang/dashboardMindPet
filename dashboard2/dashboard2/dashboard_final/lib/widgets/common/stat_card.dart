@@ -14,16 +14,16 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final availableWidth = MediaQuery.of(context).size.width;
+    final cardWidth = availableWidth < 360 ? double.infinity : 260.0;
+
     return Container(
-      width: 260,
+      width: cardWidth,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         gradient: const LinearGradient(
-          colors: [
-            Color(0xFF7C4DFF),
-            Color(0xFF4DA8FF),
-          ],
+          colors: [Color(0xFF7C4DFF), Color(0xFF4DA8FF)],
         ),
       ),
       child: Column(
@@ -41,9 +41,7 @@ class StatCard extends StatelessWidget {
           ),
           Text(
             title,
-            style: const TextStyle(
-              color: Color.fromARGB(179, 255, 255, 255),
-            ),
+            style: const TextStyle(color: Color.fromARGB(179, 255, 255, 255)),
           ),
         ],
       ),

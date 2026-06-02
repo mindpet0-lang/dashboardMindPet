@@ -6,9 +6,8 @@ import '../providers/dashboard_provider.dart';
 import '../../widgets/layout/app_layout.dart';
 import '../../widgets/common/stat_card.dart';
 
-
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_text_styles.dart'; 
+import '../../core/constants/app_text_styles.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -21,8 +20,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      Provider.of<DashboardProvider>(context, listen: false).loadStats();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<DashboardProvider>().loadStats();
     });
   }
 
@@ -30,34 +30,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final provider = Provider.of<DashboardProvider>(context);
     final isMobile = MediaQuery.of(context).size.width < 900;
-    
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? Colors.white : const Color(0xFF1E293B);
 
     return AppLayout(
       title: "MindPet",
       currentIndex: 0,
-      child: provider.loading 
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: () => provider.loadStats(),
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(24),
-                child: Column(
+      child: RefreshIndicator(
+        onRefresh: () => provider.loadStats(),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.all(isMobile ? 16 : 24),
+          child: provider.loading
+              ? SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.55,
+                  child: const Center(child: CircularProgressIndicator()),
+                )
+              : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildHeader(textColor),
                     const SizedBox(height: 24),
-                    
                     _buildStatCards(provider),
                     const SizedBox(height: 32),
-
                     _buildGridSection(provider, isMobile, textColor),
                   ],
                 ),
-              ),
-            ),
+        ),
+      ),
     );
   }
 
@@ -118,7 +119,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  Widget _buildGridSection(DashboardProvider provider, bool isMobile, Color textColor) {
+  Widget _buildGridSection(
+    DashboardProvider provider,
+    bool isMobile,
+    Color textColor,
+  ) {
     final List<dynamic> diariosReales = provider.stats["recentDiarios"] ?? [];
     final List<dynamic> usuariosReales = provider.stats["recentUsuarios"] ?? [];
 
@@ -128,7 +133,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       crossAxisCount: isMobile ? 1 : 2,
       crossAxisSpacing: 20,
       mainAxisSpacing: 20,
-      childAspectRatio: isMobile ? 1.2 : 1.5,
+      childAspectRatio: isMobile ? 1.35 : 1.5,
       children: [
         // 👥 COMPONENTE 1 NUEVO: Lista de Últimos Usuarios Registrados (Reemplazó al PieChart)
         _buildCardContainer(
@@ -145,7 +150,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 : ListView.builder(
                     shrinkWrap: true,
                     physics: const ClampingScrollPhysics(),
-                    itemCount: usuariosReales.length > 4 ? 4 : usuariosReales.length,
+                    itemCount: usuariosReales.length > 4
+                        ? 4
+                        : usuariosReales.length,
                     itemBuilder: (context, index) {
                       final usuario = usuariosReales[index];
                       final String nombre = usuario['nombre'] ?? 'Sin nombre';
@@ -160,14 +167,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           children: [
                             CircleAvatar(
                               radius: 18,
-                              backgroundColor: AppColors.primary.withOpacity(0.1),
-                              backgroundImage: (fotoPerfil != null && fotoPerfil.isNotEmpty && !fotoPerfil.startsWith('http'))
+                              backgroundColor: AppColors.primary.withValues(
+                                alpha: 0.1,
+                              ),
+                              backgroundImage:
+                                  (fotoPerfil != null &&
+                                      fotoPerfil.isNotEmpty &&
+                                      !fotoPerfil.startsWith('http'))
                                   ? MemoryImage(base64Decode(fotoPerfil))
-                                  : (fotoPerfil != null && fotoPerfil.startsWith('http'))
-                                      ? NetworkImage(fotoPerfil) as ImageProvider
-                                      : null,
+                                  : (fotoPerfil != null &&
+                                        fotoPerfil.startsWith('http'))
+                                  ? NetworkImage(fotoPerfil) as ImageProvider
+                                  : null,
                               child: (fotoPerfil == null || fotoPerfil.isEmpty)
-                                  ? const Icon(Icons.person, size: 18, color: AppColors.primary)
+                                  ? const Icon(
+                                      Icons.person,
+                                      size: 18,
+                                      color: AppColors.primary,
+                                    )
                                   : null,
                             ),
                             const SizedBox(width: 12),
@@ -176,7 +193,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         nombre,
@@ -187,20 +205,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         ),
                                       ),
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 6,
+                                          vertical: 2,
+                                        ),
                                         decoration: BoxDecoration(
-                                          color: rol == 'ADMIN' 
-                                              ? const Color(0xFFFEE2E2) 
+                                          color: rol == 'ADMIN'
+                                              ? const Color(0xFFFEE2E2)
                                               : const Color(0xFFE0F2FE),
-                                          borderRadius: BorderRadius.circular(6),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
                                         ),
                                         child: Text(
                                           rol,
                                           style: TextStyle(
                                             fontSize: 9,
                                             fontWeight: FontWeight.bold,
-                                            color: rol == 'ADMIN' 
-                                                ? const Color(0xFFEF4444) 
+                                            color: rol == 'ADMIN'
+                                                ? const Color(0xFFEF4444)
                                                 : const Color(0xFF0284C7),
                                           ),
                                         ),
@@ -208,23 +231,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     ],
                                   ),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
                                         child: Text(
                                           correo,
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
-                                          style: AppTextStyles.bodySmall.copyWith(fontSize: 11),
+                                          style: AppTextStyles.bodySmall
+                                              .copyWith(fontSize: 11),
                                         ),
                                       ),
                                       Row(
                                         children: [
-                                          const Icon(Icons.monetization_on, size: 12, color: Colors.amber),
+                                          const Icon(
+                                            Icons.monetization_on,
+                                            size: 12,
+                                            color: Colors.amber,
+                                          ),
                                           const SizedBox(width: 2),
                                           Text(
                                             "$monedas",
-                                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
+                                            style: const TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w500,
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -256,7 +288,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 : ListView.builder(
                     shrinkWrap: true,
                     physics: const ClampingScrollPhysics(),
-                    itemCount: diariosReales.length > 4 ? 4 : diariosReales.length,
+                    itemCount: diariosReales.length > 4
+                        ? 4
+                        : diariosReales.length,
                     itemBuilder: (context, index) {
                       final diario = diariosReales[index];
                       final String titulo = diario['titulo'] ?? 'Sin título';
@@ -276,45 +310,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
 
         // 📊 COMPONENTE 3: Barras de Análisis de la IA
-       // _buildCardContainer(
-       //   title: "Análisis Promedio IA Global",
-       //   textColor: textColor,
-       //   child: Column(
-       //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-       //     children: const [
-       //       _ProgressBarRow(label: "Calma", percentage: 0.80, color: AppColors.secondary),
-       //       _ProgressBarRow(label: "Estrés", percentage: 0.30, color: AppColors.primary),
-       //       _ProgressBarRow(label: "Ansiedad", percentage: 0.25, color: AppColors.accent),
-       //     ],
-       //   ),
-       // ),
-//
-       // // 🗺️ COMPONENTE 4: Mapa dinámico
-       // _buildCardContainer(
-       //   title: "Focos de Alerta (Bogotá)",
-       //   textColor: textColor,
-       //   child: const Expanded(
-       //     child: MovableMapWidget(),
-       //   ),
-       // ),
+        // _buildCardContainer(
+        //   title: "Análisis Promedio IA Global",
+        //   textColor: textColor,
+        //   child: Column(
+        //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        //     children: const [
+        //       _ProgressBarRow(label: "Calma", percentage: 0.80, color: AppColors.secondary),
+        //       _ProgressBarRow(label: "Estrés", percentage: 0.30, color: AppColors.primary),
+        //       _ProgressBarRow(label: "Ansiedad", percentage: 0.25, color: AppColors.accent),
+        //     ],
+        //   ),
+        // ),
+        //
+        // // 🗺️ COMPONENTE 4: Mapa dinámico
+        // _buildCardContainer(
+        //   title: "Focos de Alerta (Bogotá)",
+        //   textColor: textColor,
+        //   child: const Expanded(
+        //     child: MovableMapWidget(),
+        //   ),
+        // ),
       ],
     );
   }
 
-  Widget _buildCardContainer({required String title, required Widget child, required Color textColor}) {
+  Widget _buildCardContainer({
+    required String title,
+    required Widget child,
+    required Color textColor,
+  }) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.withOpacity(0.15)),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.15)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: AppTextStyles.heading2.copyWith(color: textColor, fontSize: 16),
+            style: AppTextStyles.heading2.copyWith(
+              color: textColor,
+              fontSize: 16,
+            ),
           ),
           const SizedBox(height: 16),
           child,
@@ -341,7 +382,7 @@ class _RecentEntryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
@@ -391,44 +432,6 @@ class _RecentEntryRow extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-// Widget auxiliar para las barras de progreso
-class _ProgressBarRow extends StatelessWidget {
-  final String label;
-  final double percentage;
-  final Color color;
-
-  const _ProgressBarRow({
-    required this.label,
-    required this.percentage,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(label, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500)),
-            Text("${(percentage * 100).toInt()}%", style: AppTextStyles.bodySmall),
-          ],
-        ),
-        const SizedBox(height: 6),
-        LinearProgressIndicator(
-          value: percentage,
-          backgroundColor: color.withOpacity(0.1),
-          valueColor: AlwaysStoppedAnimation<Color>(color),
-          minHeight: 8,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        const SizedBox(height: 10),
-      ],
     );
   }
 }

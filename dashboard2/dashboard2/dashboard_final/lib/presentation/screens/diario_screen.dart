@@ -13,14 +13,12 @@ class DiarioScreen extends StatefulWidget {
 }
 
 class _DiarioScreenState extends State<DiarioScreen> {
-  // 🔗 URL Base de tu Backend en Railway
   final String baseUrl = "https://backendmindpet-production.up.railway.app";
-  
-  List<dynamic> diarioEntradas = []; 
+
+  List<dynamic> diarioEntradas = [];
   bool isLoading = true;
   int totalEntradas = 0;
-  
-  // Contadores enteros para las tarjetas superiores
+
   int cantidadFelicidad = 0;
   int cantidadOtrasEmociones = 0;
 
@@ -30,7 +28,6 @@ class _DiarioScreenState extends State<DiarioScreen> {
     _cargarDatosDelBack();
   }
 
-  // 📥 GET: /diarios/listar
   Future<void> _cargarDatosDelBack() async {
     setState(() => isLoading = true);
     try {
@@ -38,11 +35,11 @@ class _DiarioScreenState extends State<DiarioScreen> {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
-        
+
         setState(() {
           diarioEntradas = data;
           totalEntradas = diarioEntradas.length;
-          _calcularCantidadesReales(data); 
+          _calcularCantidadesReales(data);
           isLoading = false;
         });
       } else {
@@ -54,39 +51,46 @@ class _DiarioScreenState extends State<DiarioScreen> {
     }
   }
 
-  // 📤 PUT: /diarios/{id} (Blindado contra errores 500 de Spring Boot)
-  Future<void> _editarEntradaEnBaseDatos(int id, String nuevoTitulo, String emocionOriginal, String nuevoContenido, int usuarioId) async {
+  Future<void> _editarEntradaEnBaseDatos(
+    int id,
+    String nuevoTitulo,
+    String emocionOriginal,
+    String nuevoContenido,
+    int usuarioId,
+  ) async {
     try {
       final response = await http.put(
         Uri.parse("$baseUrl/diarios/$id"),
         headers: {"Content-Type": "application/json"},
-        // Enviamos las variantes de nombres de variables para que coincida sí o sí con tu modelo de Java
         body: json.encode({
           "id": id,
           "titulo": nuevoTitulo,
-          "emocion": emocionOriginal, 
+          "emocion": emocionOriginal,
           "contenido": nuevoContenido,
-          "usuarioId": usuarioId,      // Convención Java CamelCase
-          "usuario_id": usuarioId,     // Convención Tabla MySQL snake_case
-          "usuario": {"id": usuarioId} // Por si tu entidad usa una relación de Objeto completa
+          "usuarioId": usuarioId,
+          "usuario_id": usuarioId,
+          "usuario": {"id": usuarioId},
         }),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         _mostrarSnackbar("Entrada ID $id modificada con éxito.");
-        _cargarDatosDelBack(); // Recarga la tabla automáticamente
+        _cargarDatosDelBack();
       } else {
-        _mostrarSnackbar("Error del servidor al actualizar. Código: ${response.statusCode}");
+        _mostrarSnackbar(
+          "Error del servidor al actualizar. Código: ${response.statusCode}",
+        );
       }
     } catch (e) {
       _mostrarSnackbar("Error de red al actualizar: $e");
     }
   }
 
-  // ❌ DELETE: /diarios/{id}/usuario/{usuarioId}
   Future<void> _eliminarEntrada(int id, int usuarioId) async {
     try {
-      final response = await http.delete(Uri.parse("$baseUrl/diarios/$id/usuario/$usuarioId"));
+      final response = await http.delete(
+        Uri.parse("$baseUrl/diarios/$id/usuario/$usuarioId"),
+      );
 
       if (response.statusCode == 200 || response.statusCode == 204) {
         setState(() {
@@ -103,34 +107,42 @@ class _DiarioScreenState extends State<DiarioScreen> {
     }
   }
 
-  // Lógica de conteo limpio basada en tu columna real de MySQL
   void _calcularCantidadesReales(List<dynamic> entradas) {
     if (entradas.isEmpty) {
       cantidadFelicidad = 0;
       cantidadOtrasEmociones = 0;
       return;
     }
-    
-    // Cuenta registros con "Amor" o "Feliz" para agrupar en Felicidad
-    cantidadFelicidad = entradas.where((e) => e['emocion'] == 'Amor' || e['emocion'] == 'Feliz' || e['emocion'] == 'Felicidad').length;
+    cantidadFelicidad = entradas
+        .where(
+          (e) =>
+              e['emocion'] == 'Amor' ||
+              e['emocion'] == 'Feliz' ||
+              e['emocion'] == 'Felicidad',
+        )
+        .length;
     cantidadOtrasEmociones = entradas.length - cantidadFelicidad;
   }
 
-  // Ventana Emergente (Muestra la emoción original como etiqueta estática, no modificable)
-  void _mostrarVentanaEditar(BuildContext context, Map<String, dynamic> entrada) {
+  void _mostrarVentanaEditar(
+    BuildContext context,
+    Map<String, dynamic> entrada,
+  ) {
     final tituloController = TextEditingController(text: entrada['titulo']);
-    final contenidoController = TextEditingController(text: entrada['contenido']);
-    
+    final String contenidoOriginal = entrada['contenido'] ?? '';
     final String emocionOriginal = entrada['emocion'] ?? "Feliz";
-    
-    // Extrae el ID del usuario de forma segura sin importar cómo lo devuelva Jackson
-    final int usuarioId = entrada['usuarioId'] ?? entrada['usuario_id'] ?? (entrada['usuario'] != null ? entrada['usuario']['id'] : 1);
+    final int usuarioId =
+        entrada['usuarioId'] ??
+        entrada['usuario_id'] ??
+        (entrada['usuario'] != null ? entrada['usuario']['id'] : 1);
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           title: Text("Moderar Registro (ID: ${entrada['id']})"),
           content: SingleChildScrollView(
             child: Column(
@@ -139,24 +151,43 @@ class _DiarioScreenState extends State<DiarioScreen> {
               children: [
                 TextField(
                   controller: tituloController,
-                  decoration: const InputDecoration(labelText: "Modificar Título"),
+                  decoration: const InputDecoration(
+                    labelText: "Modificar Título",
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  "Emoción registrada por el usuario:",
+                  "Emoción registrada:",
                   style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 ),
                 const SizedBox(height: 4),
                 Chip(
                   label: Text(emocionOriginal),
-                  backgroundColor: const Color(0xFF06B6D4).withOpacity(0.1),
-                  labelStyle: const TextStyle(color: Color(0xFF06B6D4), fontWeight: FontWeight.bold),
+                  backgroundColor: const Color(
+                    0xFF06B6D4,
+                  ).withValues(alpha: 0.1),
+                  labelStyle: const TextStyle(
+                    color: Color(0xFF06B6D4),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 12),
-                TextField(
-                  controller: contenidoController,
-                  maxLines: 3,
-                  decoration: const InputDecoration(labelText: "Modificar Contenido"),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: const Text(
+                    "🔒 Contenido privado oculto por seguridad.",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -164,21 +195,29 @@ class _DiarioScreenState extends State<DiarioScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancelar", style: TextStyle(color: Colors.grey)),
+              child: const Text(
+                "Cancelar",
+                style: TextStyle(color: Colors.grey),
+              ),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF8B5CF6)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF8B5CF6),
+              ),
               onPressed: () {
                 _editarEntradaEnBaseDatos(
                   entrada['id'],
                   tituloController.text,
-                  emocionOriginal, 
-                  contenidoController.text,
+                  emocionOriginal,
+                  contenidoOriginal,
                   usuarioId,
                 );
                 Navigator.pop(context);
               },
-              child: const Text("Guardar Cambios", style: TextStyle(color: Colors.white)),
+              child: const Text(
+                "Guardar Cambios",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         );
@@ -187,7 +226,9 @@ class _DiarioScreenState extends State<DiarioScreen> {
   }
 
   void _mostrarSnackbar(String mensaje) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensaje)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(mensaje)));
   }
 
   @override
@@ -197,150 +238,235 @@ class _DiarioScreenState extends State<DiarioScreen> {
     return AppLayout(
       title: "Diario emocional",
       currentIndex: 1,
-      child: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // --- SECCIÓN SUPERIOR ---
-                  if (isMobile)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: _buildUpperWidgetsMobile(),
-                    )
-                  else
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: double.infinity,
-                          child: DiarySummaryCard(
-                            title: "Entradas al diario",
-                            value: totalEntradas.toString(),
-                            icon: Icons.book,
-                            color: const Color(0xFF8B5CF6),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: MoodIndicator(
-                                mood: "Felicidad",
-                                percentage: cantidadFelicidad.toDouble(), 
-                                color: const Color(0xFF06B6D4),
-                                icon: Icons.sentiment_very_satisfied,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: MoodIndicator(
-                                mood: "Otras Emociones",
-                                percentage: cantidadOtrasEmociones.toDouble(),
-                                color: const Color(0xFF6366F1),
-                                icon: Icons.bubble_chart,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-
-                  const SizedBox(height: 32),
-
-                  // --- TABLA CRUD HISTORIAL (MYSQL) ---
-                  Card(
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                      side: BorderSide(color: Colors.grey.shade200),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
+      child: RefreshIndicator(
+        onRefresh: _cargarDatosDelBack,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.all(isMobile ? 14 : 20),
+          child: isLoading
+              ? SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.55,
+                  child: const Center(child: CircularProgressIndicator()),
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (isMobile)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: _buildUpperWidgetsMobile(),
+                      )
+                    else
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "Historial del Diario (MySQL)",
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 20),
-                          if (diarioEntradas.isEmpty)
-                            const Center(child: Text("No se encontraron registros de usuarios."))
-                          else
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: DataTable(
-                                horizontalMargin: 0,
-                                columnSpacing: 45,
-                                columns: const [
-                                  DataColumn(label: Text('ID', style: TextStyle(fontWeight: FontWeight.bold))),
-                                  DataColumn(label: Text('Título', style: TextStyle(fontWeight: FontWeight.bold))),
-                                  DataColumn(label: Text('Emoción', style: TextStyle(fontWeight: FontWeight.bold))),
-                                  DataColumn(label: Text('Contenido', style: TextStyle(fontWeight: FontWeight.bold))),
-                                  DataColumn(label: Text('Usuario ID', style: TextStyle(fontWeight: FontWeight.bold))),
-                                  DataColumn(label: Text('Acciones', style: TextStyle(fontWeight: FontWeight.bold))),
-                                ],
-                                rows: diarioEntradas.map((entrada) {
-                                  final int currentUsuarioId = entrada['usuarioId'] ?? entrada['usuario_id'] ?? (entrada['usuario'] != null ? entrada['usuario']['id'] : 1);
-                                  
-                                  return DataRow(cells: [
-                                    DataCell(Text(entrada['id'].toString())),
-                                    DataCell(
-                                      Container(
-                                        constraints: const BoxConstraints(maxWidth: 180),
-                                        child: Text(
-                                          entrada['titulo'] ?? '',
-                                          style: const TextStyle(fontWeight: FontWeight.w600),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      Chip(
-                                        label: Text(entrada['emocion'] ?? 'Sin asignar'),
-                                        backgroundColor: const Color(0xFF06B6D4).withOpacity(0.1),
-                                        labelStyle: const TextStyle(color: Color(0xFF06B6D4), fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    DataCell(
-                                      Container(
-                                        constraints: const BoxConstraints(maxWidth: 280),
-                                        child: Text(
-                                          entrada['contenido'] ?? '',
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),
-                                    DataCell(Text(currentUsuarioId.toString())),
-                                    DataCell(
-                                      Row(
-                                        children: [
-                                          IconButton(
-                                            icon: const Icon(Icons.edit_note, color: Colors.blue),
-                                            onPressed: () => _mostrarVentanaEditar(context, Map<String, dynamic>.from(entrada)),
-                                          ),
-                                          IconButton(
-                                            icon: const Icon(Icons.delete_outline, color: Colors.red),
-                                            onPressed: () => _eliminarEntrada(entrada['id'], currentUsuarioId), 
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ]);
-                                }).toList(),
-                              ),
+                          SizedBox(
+                            width: double.infinity,
+                            child: DiarySummaryCard(
+                              title: "Entradas al diario",
+                              value: totalEntradas.toString(),
+                              icon: Icons.book,
+                              color: const Color(0xFF8B5CF6),
                             ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: MoodIndicator(
+                                  mood: "Felicidad",
+                                  percentage: cantidadFelicidad.toDouble(),
+                                  color: const Color(0xFF06B6D4),
+                                  icon: Icons.sentiment_very_satisfied,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: MoodIndicator(
+                                  mood: "Otras Emociones",
+                                  percentage: cantidadOtrasEmociones.toDouble(),
+                                  color: const Color(0xFF6366F1),
+                                  icon: Icons.bubble_chart,
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
+
+                    const SizedBox(height: 32),
+
+                    Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        side: BorderSide(color: Colors.grey.shade200),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Historial del Diario (MySQL)",
+                              style: Theme.of(context).textTheme.titleLarge
+                                  ?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 20),
+                            if (diarioEntradas.isEmpty)
+                              const Center(
+                                child: Text(
+                                  "No se encontraron registros de usuarios.",
+                                ),
+                              )
+                            else
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: DataTable(
+                                  horizontalMargin: 0,
+                                  columnSpacing: 60,
+                                  columns: const [
+                                    DataColumn(
+                                      label: Text(
+                                        'ID',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    DataColumn(
+                                      label: Text(
+                                        'Usuario Propietario',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    DataColumn(
+                                      label: Text(
+                                        'Título de Referencia',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    DataColumn(
+                                      label: Text(
+                                        'Emoción Detectada',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    DataColumn(
+                                      label: Text(
+                                        'Acciones',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                  rows: diarioEntradas.map((entrada) {
+                                    final int currentUsuarioId =
+                                        entrada['usuarioId'] ??
+                                        entrada['usuario_id'] ??
+                                        (entrada['usuario'] != null
+                                            ? entrada['usuario']['id']
+                                            : 1);
+
+                                    // 💡 Extrae el nombre real desde el objeto relacional 'usuario' devuelto por Spring Boot / MySQL
+                                    final String nombreUsuario =
+                                        entrada['usuario'] != null &&
+                                            entrada['usuario']['nombre'] != null
+                                        ? entrada['usuario']['nombre']
+                                              .toString()
+                                        : "Usuario #$currentUsuarioId";
+
+                                    return DataRow(
+                                      cells: [
+                                        DataCell(
+                                          Text(entrada['id'].toString()),
+                                        ),
+                                        // ✨ Muestra el nombre real de registro aquí
+                                        DataCell(
+                                          Text(
+                                            nombreUsuario,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                        DataCell(
+                                          Container(
+                                            constraints: const BoxConstraints(
+                                              maxWidth: 200,
+                                            ),
+                                            child: Text(
+                                              entrada['titulo'] ?? '',
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ),
+                                        DataCell(
+                                          Chip(
+                                            label: Text(
+                                              entrada['emocion'] ??
+                                                  'Sin asignar',
+                                            ),
+                                            backgroundColor: const Color(
+                                              0xFF06B6D4,
+                                            ).withValues(alpha: 0.1),
+                                            labelStyle: const TextStyle(
+                                              color: Color(0xFF06B6D4),
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        DataCell(
+                                          Row(
+                                            children: [
+                                              IconButton(
+                                                icon: const Icon(
+                                                  Icons.edit_note,
+                                                  color: Colors.blue,
+                                                ),
+                                                onPressed: () =>
+                                                    _mostrarVentanaEditar(
+                                                      context,
+                                                      Map<String, dynamic>.from(
+                                                        entrada,
+                                                      ),
+                                                    ),
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(
+                                                  Icons.delete_outline,
+                                                  color: Colors.red,
+                                                ),
+                                                onPressed: () =>
+                                                    _eliminarEntrada(
+                                                      entrada['id'],
+                                                      currentUsuarioId,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
+                  ],
+                ),
+        ),
+      ),
     );
   }
 

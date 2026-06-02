@@ -31,31 +31,43 @@ class _ForoScreenState extends State<ForoScreen> {
 
   Widget _buildForoContent(BuildContext context, ForoProvider provider) {
     final isMobile = MediaQuery.of(context).size.width < 800;
+    final useSingleColumnStats = MediaQuery.of(context).size.width < 520;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? Colors.white : const Color(0xFF1E293B);
 
     return AppLayout(
       title: "Control del Foro",
       currentIndex: 3,
-      child: provider.loading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: provider.loadForoData,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
+      child: RefreshIndicator(
+        onRefresh: provider.loadForoData,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(isMobile ? 14 : 20),
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: provider.loading
+              ? SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.55,
+                  child: const Center(child: CircularProgressIndicator()),
+                )
+              : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildHeader(textColor),
                     const SizedBox(height: 24),
                     GridView.count(
-                      crossAxisCount: isMobile ? 2 : 4,
+                      crossAxisCount: useSingleColumnStats
+                          ? 1
+                          : isMobile
+                          ? 2
+                          : 4,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
-                      childAspectRatio: isMobile ? 1.2 : 1.4,
+                      childAspectRatio: useSingleColumnStats
+                          ? 2.3
+                          : isMobile
+                          ? 1.35
+                          : 1.4,
                       children: [
                         _buildStatMiniCard(
                           title: "Total Posts",
@@ -134,8 +146,8 @@ class _ForoScreenState extends State<ForoScreen> {
                     ),
                   ],
                 ),
-              ),
-            ),
+        ),
+      ),
     );
   }
 
