@@ -19,7 +19,8 @@ class ChatbotModel {
       content: json['content'] ?? json['message'] ?? '', 
       sender: json['sender'] ?? 'USER',
       timestamp: json['timestamp'] ?? '',
-      userId: json['user_id'] ?? json['userId'] ?? 1,
+      // 🔑 Mapeo seguro para bases de datos relacionales (user_id)
+      userId: json['user_id'] ?? json['userId'] ?? 0,
     );
   }
 

@@ -5,6 +5,8 @@ import '../../widgets/layout/app_layout.dart';
 import '../../widgets/diario/diary_sumary_card.dart';
 import '../../widgets/diario/mood_indicator.dart';
 
+import '../../widgets/charts/bar_chart_widget.dart';
+
 class DiarioScreen extends StatefulWidget {
   const DiarioScreen({super.key});
 
@@ -38,7 +40,7 @@ class _DiarioScreenState extends State<DiarioScreen> {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
-
+debugPrint(data.first.toString());
         setState(() {
           diarioEntradas = data;
           totalEntradas = diarioEntradas.length;
@@ -241,6 +243,24 @@ class _DiarioScreenState extends State<DiarioScreen> {
     return 0.0;
   }
 
+  Map<String, int> _obtenerDiariosPorDia() {
+  Map<String, int> diariosPorDia = {};
+
+  for (var diario in diarioEntradas) {
+    final fechaCompleta = diario["fechaCreacion"];
+
+    if (fechaCompleta != null) {
+      final fecha = fechaCompleta.split("T")[0];
+
+      diariosPorDia[fecha] =
+          (diariosPorDia[fecha] ?? 0) + 1;
+    }
+  }
+debugPrint(diariosPorDia.toString());
+
+  return diariosPorDia;
+}
+
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 700;
@@ -307,7 +327,22 @@ class _DiarioScreenState extends State<DiarioScreen> {
 
                     const SizedBox(height: 32),
 
-                    Card(
+Text(
+  "Diarios creados por día",
+  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+        fontWeight: FontWeight.bold,
+      ),
+),
+
+const SizedBox(height: 16),
+
+BarChartWidget(
+  diariosPorDia: _obtenerDiariosPorDia(),
+),
+
+const SizedBox(height: 32),
+
+Card(
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(24),
@@ -505,3 +540,4 @@ class _DiarioScreenState extends State<DiarioScreen> {
     ];
   }
 }
+//hola

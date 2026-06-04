@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../presentation/providers/chatbot_provider.dart';
 
 class ChatbotMessageCard extends StatelessWidget {
@@ -35,41 +34,26 @@ class ChatbotMessageCard extends StatelessWidget {
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Theme(
-              data: Theme.of(
-                context,
-              ).copyWith(dividerColor: Colors.grey.withValues(alpha: 0.15)),
+              data: Theme.of(context).copyWith(
+                dividerColor: Colors.grey.withValues(alpha: 0.15),
+              ),
               child: DataTable(
                 headingRowColor: WidgetStateProperty.all(
-                  Theme.of(
-                    context,
-                  ).scaffoldBackgroundColor.withValues(alpha: 0.6),
+                  Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.6),
                 ),
                 columnSpacing: 35,
                 columns: const [
                   DataColumn(
-                    label: Text(
-                      'ID',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    label: Text('ID', style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                   DataColumn(
-                    label: Text(
-                      'Remitente',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  // 🔒 La columna 'Contenido' ha sido eliminada por privacidad de la auditoría.
-                  DataColumn(
-                    label: Text(
-                      'Timestamp',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    label: Text('Remitente', style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                   DataColumn(
-                    label: Text(
-                      'Usuario ID',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    label: Text('Timestamp', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  DataColumn(
+                    label: Text('Usuario ID', style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ],
                 rows: realMessages.map((msg) {
@@ -79,7 +63,6 @@ class ChatbotMessageCard extends StatelessWidget {
                       DataCell(
                         _SenderBadge(sender: msg.sender, isUser: msg.isUser),
                       ),
-                      // 🔒 Se eliminó la celda que contenía msg.content
                       DataCell(Text(msg.timestamp)),
                       DataCell(Text(msg.userId.toString())),
                     ],

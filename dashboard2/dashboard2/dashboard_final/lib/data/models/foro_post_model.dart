@@ -94,3 +94,4 @@ class ForoPost {
     return image;
   }
 }
+//hola

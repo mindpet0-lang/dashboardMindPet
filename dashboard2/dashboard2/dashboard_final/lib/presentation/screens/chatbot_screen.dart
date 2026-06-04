@@ -97,9 +97,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
                               ],
                             ),
                             child: const ClipRRect(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(16),
-                              ),
+                              borderRadius: BorderRadius.all(Radius.circular(16)),
                               child: ChatbotMessageCard(),
                             ),
                           ),
@@ -118,12 +116,10 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
 
   Map<String, int> _buildUserStats(List<ChatbotModel> messages) {
     final stats = <String, int>{};
-
     for (final msg in messages) {
       final label = "Usuario #${msg.userId}";
       stats[label] = (stats[label] ?? 0) + 1;
     }
-
     return stats;
   }
 
@@ -151,7 +147,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           const SizedBox(height: 4),
           Text(
             provider.isLoading
-                ? "Cargando historial desde PostgreSQL..."
+                ? "Cargando historial unificado..."
                 : "Conexion directa con PostgreSQL - ${provider.messages.length} filas detectadas",
             style: const TextStyle(color: Colors.white, fontSize: 13),
           ),
@@ -178,68 +174,63 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
       child: provider.isLoading
           ? const Center(child: CircularProgressIndicator())
           : stats.isEmpty
-          ? const Center(child: Text("No hay datos suficientes para graficar"))
-          : BarChart(
-              BarChartData(
-                alignment: BarChartAlignment.spaceAround,
-                maxY: maxY,
-                barTouchData: BarTouchData(enabled: true),
-                gridData: const FlGridData(show: true, drawVerticalLine: false),
-                borderData: FlBorderData(show: false),
-                titlesData: FlTitlesData(
-                  topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  leftTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: true, reservedSize: 30),
-                  ),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 42,
-                      getTitlesWidget: (value, meta) {
-                        final index = value.toInt();
-                        if (index < 0 || index >= userLabels.length) {
-                          return const SizedBox.shrink();
-                        }
-
-                        return SideTitleWidget(
-                          meta: meta,
-                          child: Text(
-                            userLabels[index],
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        );
-                      },
+              ? const Center(child: Text("No hay datos suficientes para graficar"))
+              : BarChart(
+                  BarChartData(
+                    alignment: BarChartAlignment.spaceAround,
+                    maxY: maxY,
+                    barTouchData: BarTouchData(enabled: true),
+                    gridData: const FlGridData(show: true, drawVerticalLine: false),
+                    borderData: FlBorderData(show: false),
+                    titlesData: FlTitlesData(
+                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      leftTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: true, reservedSize: 30),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 42,
+                          getTitlesWidget: (value, meta) {
+                            final index = value.toInt();
+                            if (index < 0 || index >= userLabels.length) {
+                              return const SizedBox.shrink();
+                            }
+                            return SideTitleWidget(
+                              meta: meta,
+                              child: Text(
+                                userLabels[index],
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     ),
+                    barGroups: List.generate(userLabels.length, (index) {
+                      final usuario = userLabels[index];
+                      final cantidad = _asDouble(stats[usuario]);
+
+                      return BarChartGroupData(
+                        x: index,
+                        barRods: [
+                          BarChartRodData(
+                            toY: cantidad,
+                            color: const Color(0xFF4F46E5),
+                            width: 16,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ],
+                      );
+                    }),
                   ),
                 ),
-                barGroups: List.generate(userLabels.length, (index) {
-                  final usuario = userLabels[index];
-                  final cantidad = _asDouble(stats[usuario]);
-
-                  return BarChartGroupData(
-                    x: index,
-                    barRods: [
-                      BarChartRodData(
-                        toY: cantidad,
-                        color: const Color(0xFF4F46E5),
-                        width: 16,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                    ],
-                  );
-                }),
-              ),
-            ),
     );
   }
 

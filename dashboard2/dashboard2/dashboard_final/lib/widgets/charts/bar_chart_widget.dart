@@ -4,10 +4,16 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 
 class BarChartWidget extends StatelessWidget {
-  const BarChartWidget({super.key});
+  final Map<String, int> diariosPorDia;
+
+  const BarChartWidget({super.key, required this.diariosPorDia});
 
   @override
   Widget build(BuildContext context) {
+    final maxValor = diariosPorDia.values.isEmpty
+        ? 1
+        : diariosPorDia.values.reduce((a, b) => a > b ? a : b) + 1;
+
     return Container(
       height: 320,
       padding: const EdgeInsets.all(20),
@@ -17,112 +23,79 @@ class BarChartWidget extends StatelessWidget {
       ),
       child: BarChart(
         BarChartData(
-          borderData: FlBorderData(show: false),
+          minY: 0,
+          maxY: maxValor.toDouble(),
 
+          borderData: FlBorderData(show: false),
           gridData: const FlGridData(show: false),
 
           titlesData: FlTitlesData(
-            leftTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: true),
+            topTitles: AxisTitles(
+  sideTitles: SideTitles(
+    showTitles: true,
+    getTitlesWidget: (value, meta) {
+      if (value.toInt() >= diariosPorDia.length) {
+        return const SizedBox();
+      }
+
+      final cantidad = diariosPorDia.values.elementAt(value.toInt());
+
+      return Text(
+        cantidad.toString(),
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    },
+  ),
+),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(showTitles: true, reservedSize: 30),
             ),
 
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget: (value, meta) {
+                  final fechas = diariosPorDia.keys.toList();
 
-                  final days = [
-                    'L',
-                    'M',
-                    'M',
-                    'J',
-                    'V',
-                    'S',
-                    'D'
-                  ];
+                  if (value.toInt() >= fechas.length) {
+                    return const SizedBox();
+                  }
 
-                  return Text(days[value.toInt()]);
+                  return Text(
+                    fechas[value.toInt()].substring(5),
+                    style: const TextStyle(fontSize: 10),
+                  );
                 },
               ),
             ),
           ),
 
-          barGroups: [
+          barGroups: diariosPorDia.entries.toList().asMap().entries.map((
+            entry,
+          ) {
+            final index = entry.key;
+            final data = entry.value;
 
-            BarChartGroupData(
-              x: 0,
+            return BarChartGroupData(
+              x: index,
               barRods: [
                 BarChartRodData(
-                  toY: 4,
-                  color: AppColors.primary,
-                  width: 18,
-                  borderRadius: BorderRadius.circular(10),
-                )
+           toY: data.value.toDouble(),
+          color: AppColors.primary,
+            width: 18,
+            borderRadius: BorderRadius.circular(10),
+            rodStackItems: [],
+               ),
               ],
-            ),
+            );
+          }).toList(),
 
-            BarChartGroupData(
-              x: 1,
-              barRods: [
-                BarChartRodData(
-                  toY: 7,
-                  color: AppColors.secondary,
-                  width: 18,
-                  borderRadius: BorderRadius.circular(10),
-                )
-              ],
-            ),
-
-            BarChartGroupData(
-              x: 2,
-              barRods: [
-                BarChartRodData(
-                  toY: 5,
-                  color: AppColors.accent,
-                  width: 18,
-                  borderRadius: BorderRadius.circular(10),
-                )
-              ],
-            ),
-
-            BarChartGroupData(
-              x: 3,
-              barRods: [
-                BarChartRodData(
-                  toY: 9,
-                  color: AppColors.primary,
-                  width: 18,
-                  borderRadius: BorderRadius.circular(10),
-                )
-              ],
-            ),
-
-            BarChartGroupData(
-              x: 4,
-              barRods: [
-                BarChartRodData(
-                  toY: 6,
-                  color: AppColors.secondary,
-                  width: 18,
-                  borderRadius: BorderRadius.circular(10),
-                )
-              ],
-            ),
-
-            BarChartGroupData(
-              x: 5,
-              barRods: [
-                BarChartRodData(
-                  toY: 8,
-                  color: AppColors.accent,
-                  width: 18,
-                  borderRadius: BorderRadius.circular(10),
-                )
-              ],
-            ),
-          ],
         ),
       ),
     );
   }
 }
+//hola

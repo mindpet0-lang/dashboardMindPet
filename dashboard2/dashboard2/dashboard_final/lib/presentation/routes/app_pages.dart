@@ -18,3 +18,4 @@ class AppPages {
     AppRoutes.foro: (context) => const ForoScreen(),
   };
 }
+//hola
