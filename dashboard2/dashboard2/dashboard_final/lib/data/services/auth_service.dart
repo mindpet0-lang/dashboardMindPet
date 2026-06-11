@@ -34,14 +34,18 @@ class AuthService {
         }),
       );
 
-      print(response.body);
 
-      if (response.statusCode == 200) {
+if (response.statusCode == 200) {
+  final Map<String, dynamic> data = jsonDecode(response.body);
 
-        return jsonDecode(
-          response.body,
-        );
-      }
+  // Validamos si tiene el rol requerido
+  if (data['rol'] == 'ADMIN') {
+    return data;
+  } else {
+    // Lanzamos un error específico para capturarlo en la UI
+    throw Exception('No tienes permisos de Administrador para ingresar.');
+  }
+}
 
       return null;
 
@@ -57,7 +61,6 @@ class AuthService {
     String nombre,
     String correo,
     String contrasena,
-    String rol,
   ) async {
 
     try {
@@ -66,7 +69,7 @@ class AuthService {
           await http.post(
 
         Uri.parse(
-          "$baseUrl/register",
+          "$baseUrl/admin",
         ),
 
         headers: {
@@ -79,7 +82,6 @@ class AuthService {
           "nombre": nombre,
           "correo": correo,
           "contrasena": contrasena,
-          "rol": rol,
         }),
       );
 

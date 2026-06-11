@@ -27,7 +27,7 @@ class AuthProvider extends ChangeNotifier {
       final response = await http.post(
 
         Uri.parse(
-          "$baseUrl/register",
+          "$baseUrl/admin",
         ),
 
         headers: {
@@ -39,8 +39,6 @@ class AuthProvider extends ChangeNotifier {
           "nombre": nombre,
           "correo": correo,
           "contrasena": contrasena,
-          "rol": rol,
-
         }),
       );
 
