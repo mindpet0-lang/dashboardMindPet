@@ -67,21 +67,28 @@ class _AppLayoutState extends State<AppLayout> {
               onTap: navigateTo,
             ),
           Expanded(
-            child: Column(
-              children: [
-                TopBar(
-                  title: widget.title,
-                  isMobile: isMobile,
-                ),
-                Expanded(
-                  child: widget.child,
-                ),
-              ],
-            ),
-          ),
+  child: Container(
+    decoration: const BoxDecoration(
+      image: DecorationImage(
+        image: AssetImage('assets/images/fondo.png'),
+        fit: BoxFit.cover,
+      ),
+    ),
+    child: Column(
+      children: [
+        TopBar(
+          title: widget.title,
+          isMobile: isMobile,
+        ),
+        Expanded(
+          child: widget.child,
+        ),
+      ],
+    ),
+  ),
+),
         ],
       ),
     );
   }
 }
-//hola

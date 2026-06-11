@@ -22,40 +22,68 @@ class Sidebar extends StatelessWidget {
       color: const Color(0xFF111133),
 
       child: Column(
+  children: [
 
-        children: [
+    const SizedBox(height: 60),
 
-          const SizedBox(height: 60),
+    buildItem(
+      icon: Icons.dashboard,
+      title: "Dashboard",
+      index: 0,
+    ),
 
-          buildItem(
-            icon: Icons.dashboard,
-            title: "Dashboard",
-            index: 0,
-          ),
+    buildItem(
+      icon: Icons.book,
+      title: "Diario",
+      index: 1,
+    ),
 
-          buildItem(
-            icon: Icons.book,
-            title: "Diario",
-            index: 1,
-          ),
+    buildItem(
+      icon: Icons.smart_toy,
+      title: "Chat IA",
+      index: 2,
+    ),
 
-          buildItem(
-            icon: Icons.smart_toy,
-            title: "Chat IA",
-            index: 2,
-          ),
+    buildItem(
+      icon: Icons.games,
+      title: "Foro",
+      index: 3,
+    ),
 
-          buildItem(
-            icon: Icons.games,
-            title: "Foro",
-            index: 3,
-          ),
+    const Spacer(),
 
-
-        ],
+    Padding(
+      padding: const EdgeInsets.all(20),
+      child: Image.asset(
+        getImage(),
+        height: 250,
+        fit: BoxFit.contain,
       ),
+    ),
+
+  ],
+),
     );
   }
+
+  String getImage() {
+  switch (currentIndex) {
+    case 0:
+      return 'assets/images/dashboard.png';
+
+    case 1:
+      return 'assets/images/diario.png';
+
+    case 2:
+      return 'assets/images/chatia.png';
+
+    case 3:
+      return 'assets/images/foro.png';
+
+    default:
+      return 'assets/images/dashboard.png';
+  }
+}
 
   Widget buildItem({
 
@@ -116,4 +144,3 @@ class Sidebar extends StatelessWidget {
     );
   }
 }
-//hola

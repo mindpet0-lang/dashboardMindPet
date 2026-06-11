@@ -13,72 +13,43 @@ import '../../widgets/common/custom_textfield.dart';
 import '../routes/app_routes.dart';
 
 class LoginScreen extends StatefulWidget {
-
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() =>
-      _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState
-    extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> {
+  final correoController = TextEditingController();
 
-  final correoController =
-      TextEditingController();
+  final contrasenaController = TextEditingController();
 
-  final contrasenaController =
-      TextEditingController();
-
-  final formKey =
-      GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
 
   bool obscureText = true;
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
 
-    final authProvider =
-        Provider.of<AuthProvider>(context);
+    final size = MediaQuery.of(context).size;
 
-    final size =
-        MediaQuery.of(context).size;
-
-    final isMobile =
-        size.width < 800;
+    final isMobile = size.width < 800;
 
     return Scaffold(
-
-      backgroundColor:
-          Theme.of(context)
-              .scaffoldBackgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
       body: SafeArea(
-
         child: Center(
-
           child: SingleChildScrollView(
-
-            padding: const EdgeInsets.all(
-              AppSizes.padding,
-            ),
+            padding: const EdgeInsets.all(AppSizes.padding),
 
             child: Container(
-
-              constraints:
-                  const BoxConstraints(
-                maxWidth: 1100,
-              ),
+              constraints: const BoxConstraints(maxWidth: 1100),
 
               child: isMobile
-
-                  ? _mobileLayout(
-                      authProvider,
-                    )
-
-                  : _desktopLayout(
-                      authProvider,
-                    ),
+                  ? _mobileLayout(authProvider)
+                  : _desktopLayout(authProvider),
             ),
           ),
         ),
@@ -86,148 +57,87 @@ class _LoginScreenState
     );
   }
 
-  Widget _desktopLayout(
-    AuthProvider authProvider,
-  ) {
-
+  Widget _desktopLayout(AuthProvider authProvider) {
     return Row(
-
       children: [
+        Expanded(child: _leftSide()),
 
-        Expanded(
-          child: _leftSide(),
-        ),
+        const SizedBox(width: 50),
 
-        const SizedBox(
-          width: 50,
-        ),
-
-        Expanded(
-          child: _loginCard(
-            authProvider,
-          ),
-        ),
+        Expanded(child: _loginCard(authProvider)),
       ],
     );
   }
 
-  Widget _mobileLayout(
-    AuthProvider authProvider,
-  ) {
-
+  Widget _mobileLayout(AuthProvider authProvider) {
     return Column(
-
       children: [
-
         _leftSide(),
 
-        const SizedBox(
-          height: 40,
-        ),
+        const SizedBox(height: 40),
 
-        _loginCard(
-          authProvider,
-        ),
+        _loginCard(authProvider),
       ],
     );
   }
 
   Widget _leftSide() {
-
     return Column(
-
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
-
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
+        // Reemplazo del Icono de Psicología por el Logo de la App
         Container(
-
-          padding:
-              const EdgeInsets.all(18),
-
+          width: 86,
+          height: 86,
           decoration: BoxDecoration(
-
-            color:
-                AppColors.primary,
-
-            borderRadius:
-                BorderRadius.circular(
-              20,
+            color: const Color(0xFF7B51FF), // Color morado de tu logo
+            borderRadius: BorderRadius.circular(22),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(22),
+            child: const Center(
+              child: Icon(
+                Icons
+                    .psychology, // <-- Icono de cerebro / psicología nativo de Flutter
+                size:
+                    50, // Ajusta el tamaño para que quepa bien en el contenedor de 86x86
+                color: Colors.white,
+              ),
             ),
           ),
-
-          child: const Icon(
-
-            Icons.psychology,
-
-            size: 50,
-
-            color: Colors.white,
-          ),
         ),
 
-        const SizedBox(
-          height: 25,
-        ),
+        const SizedBox(height: 25),
 
         Text(
-
           "MindPet",
 
-          style:
-              AppTextStyles.title.copyWith(
-            color: AppColors.primary,
-          ),
+          style: AppTextStyles.title.copyWith(color: AppColors.primary),
         ),
 
-        const SizedBox(
-          height: 20,
-        ),
+        const SizedBox(height: 20),
 
-        Text(
+        Text("Tu espacio emocional inteligente", style: AppTextStyles.subtitle),
 
-          "Tu espacio emocional inteligente",
+        const SizedBox(height: 30),
 
-          style:
-              AppTextStyles.subtitle,
-        ),
-
-        const SizedBox(
-          height: 30,
-        ),
-
+        // Reemplazo del Icono de Corazón por la Ilustración de la Mascota
         Container(
-
           height: 280,
-
+          width: double.infinity,
           decoration: BoxDecoration(
-
             gradient: LinearGradient(
-
-              colors: [
-
-                AppColors.primary,
-
-                AppColors.secondary,
-              ],
+              colors: [AppColors.primary, AppColors.secondary],
             ),
-
-            borderRadius:
-                BorderRadius.circular(
-              30,
-            ),
+            borderRadius: BorderRadius.circular(30),
           ),
-
-          child: const Center(
-
-            child: Icon(
-
-              Icons.favorite,
-
-              color: Colors.white,
-
-              size: 120,
+          child: Padding(
+            padding: const EdgeInsets.all(
+              20.0,
+            ), // Margen para que no toque los bordes
+            child: Image.asset(
+              'assets/images/logowhite.png', // <-- Tu archivo de la ilustración lineal en blanco y negro
+              fit: BoxFit.contain,
             ),
           ),
         ),
@@ -235,27 +145,17 @@ class _LoginScreenState
     );
   }
 
-  Widget _loginCard(
-    AuthProvider authProvider,
-  ) {
-
+  Widget _loginCard(AuthProvider authProvider) {
     return Container(
-
-      padding:
-          const EdgeInsets.all(32),
+      padding: const EdgeInsets.all(32),
 
       decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
 
-        color:
-            Theme.of(context).cardColor,
-
-        borderRadius:
-            BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(30),
 
         boxShadow: [
-
           BoxShadow(
-
             color: Colors.black12,
 
             blurRadius: 15,
@@ -266,213 +166,121 @@ class _LoginScreenState
       ),
 
       child: Form(
-
         key: formKey,
 
         child: Column(
-
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
 
           children: [
+            Text("Iniciar Sesión", style: AppTextStyles.title),
 
-            Text(
+            const SizedBox(height: 10),
 
-              "Iniciar Sesión",
+            Text("Bienvenida nuevamente", style: AppTextStyles.subtitle),
 
-              style:
-                  AppTextStyles.title,
-            ),
-
-            const SizedBox(
-              height: 10,
-            ),
-
-            Text(
-
-              "Bienvenida nuevamente",
-
-              style:
-                  AppTextStyles.subtitle,
-            ),
-
-            const SizedBox(
-              height: 35,
-            ),
+            const SizedBox(height: 35),
 
             // CORREO
             CustomTextField(
+              controller: correoController,
 
-              controller:
-                  correoController,
+              hint: "Correo electrónico",
 
-              hint:
-                  "Correo electrónico",
-
-              icon:
-                  Icons.email_outlined,
+              icon: Icons.email_outlined,
             ),
 
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
 
             // CONTRASEÑA
             TextFormField(
+              controller: contrasenaController,
 
-              controller:
-                  contrasenaController,
+              obscureText: obscureText,
 
-              obscureText:
-                  obscureText,
+              decoration: InputDecoration(
+                hintText: "Contraseña",
 
-              decoration:
-                  InputDecoration(
+                prefixIcon: const Icon(Icons.lock),
 
-                hintText:
-                    "Contraseña",
-
-                prefixIcon:
-                    const Icon(
-                  Icons.lock,
-                ),
-
-                suffixIcon:
-                    IconButton(
-
+                suffixIcon: IconButton(
                   onPressed: () {
-
                     setState(() {
-
-                      obscureText =
-                          !obscureText;
+                      obscureText = !obscureText;
                     });
                   },
 
                   icon: Icon(
-
-                    obscureText
-
-                        ? Icons.visibility
-
-                        : Icons.visibility_off,
+                    obscureText ? Icons.visibility : Icons.visibility_off,
                   ),
                 ),
 
                 filled: true,
 
-                fillColor:
-                    AppColors.inputColor,
+                fillColor: AppColors.inputColor,
 
-                border:
-                    OutlineInputBorder(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(18),
 
-                  borderRadius:
-                      BorderRadius.circular(
-                    18,
-                  ),
-
-                  borderSide:
-                      BorderSide.none,
+                  borderSide: BorderSide.none,
                 ),
               ),
             ),
 
-            const SizedBox(
-              height: 30,
-            ),
+            const SizedBox(height: 30),
 
             // BOTÓN LOGIN
             SizedBox(
-
               width: double.infinity,
 
               height: 55,
 
               child: CustomButton(
-
-                text:
-                    authProvider.loading
-
-                        ? "Cargando..."
-
-                        : "Ingresar",
+                text: authProvider.loading ? "Cargando..." : "Ingresar",
 
                 onPressed: () async {
-
-                  final success =
-
-                      await authProvider.login(
-
-                    correoController.text.trim(),
-
-                    contrasenaController.text.trim(),
-                  );
-
-                  print("LOGIN SUCCESS:");
-                  print(success);
-
-                  if (!context.mounted) return;
-
-                  if (success) {
-
-                    Navigator.pushReplacementNamed(
-
-                      context,
-
-                      "/dashboard",
+                  // 1. Validar que los campos cumplan con las condiciones del Form antes de disparar la petición
+                  if (formKey.currentState!.validate()) {
+                    final success = await authProvider.login(
+                      correoController.text.trim(),
+                      contrasenaController
+                          .text, // Prueba quitando el .trim() aquí si sospechas del espacio oculto
                     );
 
-                  } else {
+                    print("LOGIN SUCCESS: $success");
 
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    if (!context.mounted) return;
 
-                      const SnackBar(
-
-                        content: Text(
-                          "Correo o contraseña incorrectos",
+                    if (success) {
+                      Navigator.pushReplacementNamed(context, "/dashboard");
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Correo o contraseña incorrectos"),
                         ),
-                      ),
-                    );
+                      );
+                    }
                   }
                 },
               ),
             ),
 
-            const SizedBox(
-              height: 25,
-            ),
+            const SizedBox(height: 25),
 
             Row(
-
-              mainAxisAlignment:
-                  MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
 
               children: [
-
-                const Text(
-                  "¿No tienes cuenta?",
-                ),
+                const Text("¿No tienes cuenta?"),
 
                 TextButton(
-
                   onPressed: () {
-
-                    Navigator.pushNamed(
-
-                      context,
-
-                      AppRoutes.register,
-                    );
+                    Navigator.pushNamed(context, AppRoutes.register);
                   },
 
                   child: Text(
-
                     "Registrarse",
 
-                    style: TextStyle(
-                      color: AppColors.primary,
-                    ),
+                    style: TextStyle(color: AppColors.primary),
                   ),
                 ),
               ],
