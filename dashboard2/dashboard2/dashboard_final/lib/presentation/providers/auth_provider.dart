@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class AuthProvider extends ChangeNotifier {
-  
+
   bool loading = false;
 
   final String baseUrl =
@@ -27,15 +27,15 @@ class AuthProvider extends ChangeNotifier {
       final response = await http.post(
         Uri.parse("$baseUrl/register"),
 
+
         headers: {"Content-Type": "application/json"},
+
 
         body: jsonEncode({
 
           "nombre": nombre,
           "correo": correo,
           "contrasena": contrasena,
-          "rol": rol,
-
         }),
       );
 

@@ -133,44 +133,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     const SizedBox(height: 20),
 
-                    // SELECTOR DE ROL
-                    DropdownButtonFormField<String>(
-                      value: selectedRole,
-
-                      decoration: InputDecoration(
-                        hintText: "Selecciona un rol",
-
-                        prefixIcon: const Icon(Icons.admin_panel_settings),
-
-                        filled: true,
-
-                        fillColor: AppColors.inputColor,
-
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-
-                      items: const [
-                        DropdownMenuItem(value: "USER", child: Text("Usuario")),
-
-                        DropdownMenuItem(
-                          value: "ADMIN",
-
-                          child: Text("Administrador"),
-                        ),
-                      ],
-
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() {
-                            selectedRole = value;
-                          });
-                        }
-                      },
-                    ),
 
                     const SizedBox(height: 30),
 
